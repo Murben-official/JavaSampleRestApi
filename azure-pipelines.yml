@@ -1,22 +1,32 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
 trigger:
-- main
-
+- master
+ 
 pool:
-  vmImage: ubuntu-latest
-
-steps:
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: false
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+  vmImage: 'ubuntu-latest'
+ 
+jobs:
+- job: 'JunitTest'
+  displayName: 'Running unit test'
+  pool:
+    vmImage: 'ubuntu-latest'
+ 
+  steps:
+  - script: echo 'running spring demo unit test'
+ 
+  - script: |
+      sudo apt-get install -y openjdk-17-jdk  # Install Java 17
+      echo "##vso[task.setvariable variable=JAVA_HOME]/usr/lib/jvm/java-17-openjdk-amd64"
+      echo "##vso[task.prependpath]$JAVA_HOME/bin"
+      java -version  # Verify the installed Java version
+    displayName: 'Set Java version'
+ 
+  - task: Maven@3
+    inputs:
+      mavenPomFile: 'pom.xml'
+      goals: 'test'
+      publishJUnitResults: true
+      options: '-Xmx3072m -Dmaven.compiler.source=17 -Dmaven.compiler.target=17'  # Set Java source and target versions
+      mavenAuthenticateFeed: false
+      sonarQubeRunAnalysis: false
+      checkStyleRunAnalysis: true
+      pmdRunAnalysis: true
