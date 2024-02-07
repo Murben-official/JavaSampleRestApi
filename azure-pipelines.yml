@@ -23,7 +23,7 @@ jobs:
   - task: Maven@3
     inputs:
       mavenPomFile: 'pom.xml'
-      goals: 'test'
+      goals: 'clean package'
       publishJUnitResults: true
       options: '-Xmx3072m -Dmaven.compiler.source=17 -Dmaven.compiler.target=17'  # Set Java source and target versions
       mavenAuthenticateFeed: false
